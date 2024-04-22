@@ -25,7 +25,6 @@ const Router = () => {
           <HomePage />
         </Layout>
       ),
-      exact: true,
     },
     {
       path: "/login",
