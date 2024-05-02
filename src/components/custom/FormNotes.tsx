@@ -38,12 +38,13 @@ const formSchema = z.object({
 });
 
 type Props = {
-  id?: string;
-  setNotes: (notes: Note[]) => void;
+  note?: Note;
+  addNote: (note: Note) => void;
+  editNote: (note: Note) => void;
   onClose: () => void;
 };
 
-const FormNotes = ({ id, setNotes, onClose }: Props) => {
+const FormNotes = ({ note, addNote, editNote, onClose }: Props) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -54,50 +55,30 @@ const FormNotes = ({ id, setNotes, onClose }: Props) => {
   });
 
   useEffect(() => {
-    if (id) {
-      if (typeof Storage !== "undefined") {
-        const notesFromStorage = localStorage.getItem("notes");
-        const notesJSON = notesFromStorage ? JSON.parse(notesFromStorage) : [];
-        const findedNote = notesJSON.find((note: Note) => note.id === id);
-
-        if (findedNote) {
-          form.setValue("title", findedNote.title);
-          form.setValue("content", findedNote.content);
-          form.setValue("tags", findedNote.tags);
-        }
-      }
+    if (note) {
+      form.setValue("title", note.title);
+      form.setValue("content", note.content);
+      form.setValue("tags", note.tags);
     }
-  }, [id, form]);
+  }, [note, form]);
 
   const handleOnSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-
-    // Verifica se o navegador suporta o armazenamento local
-    if (typeof Storage !== "undefined") {
-      const notesFromStorage = localStorage.getItem("notes");
-      const notesJSON = notesFromStorage ? JSON.parse(notesFromStorage) : [];
-
-      const findedNote = notesJSON.find((note: Note) => note.id === id);
-
-      if (findedNote) {
-        const updatedNote = { ...findedNote, ...values };
-        const updatedNotes = notesJSON.map((note: Note) =>
-          note.id === id ? updatedNote : note
-        );
-        localStorage.setItem("notes", JSON.stringify(updatedNotes));
-        setNotes(updatedNotes);
-        onClose();
-        return;
-      }
-
-      const newNote = { ...values, date: new Date().getTime(), id: uuid() };
-      const insertedNotes = [...notesJSON, newNote];
-      localStorage.setItem("notes", JSON.stringify(insertedNotes));
-      setNotes(insertedNotes);
+    if (note) {
+      const editedNote = {
+        ...note,
+        ...values,
+      } as Note;
+      editNote(editedNote);
       onClose();
-    } else {
-      console.error("Seu navegador não suporta armazenamento local.");
+      return;
     }
+    const newNote = {
+      ...values,
+      date: new Date().getTime(),
+      id: uuid(),
+    } as Note;
+    addNote(newNote);
+    onClose();
   };
 
   return (
