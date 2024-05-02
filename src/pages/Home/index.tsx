@@ -120,7 +120,9 @@ const HomePage = () => {
       <div className="container mx-auto">
         <DragDropContext onDragEnd={onDragEnd}>
           <StrictModeDroppable droppableId="NOTE" direction="horizontal">
-            {(provided, snapshot) => (
+            {(
+              provided //{(provided, snapshot) => (
+            ) => (
               <div
                 className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-4 mt-8"
                 {...provided.droppableProps}
@@ -132,7 +134,9 @@ const HomePage = () => {
                     index={index}
                     draggableId={`draggable-${note.id}`}
                   >
-                    {(provided, snapshot) => (
+                    {(
+                      provided //{(provided, snapshot) => (
+                    ) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
